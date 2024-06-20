@@ -123,3 +123,19 @@ h1 {
     color: #0CD977;
     cursor: default;
 }
+
+/* proprietà da aggiungere ogni volta che l'immagine è null */
+.fallback-profile{
+    background-color: purple;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    padding: 10px;
+    text-align:center;
+    color: white;
+}
+
+.fallback-text{
+    font-size: 30px;
+    line-height: 40px;
+}

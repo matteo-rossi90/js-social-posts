@@ -12,10 +12,10 @@ Salviamo in un secondo array gli id dei post ai quali abbiamo messo il like.*/
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Individuare il contenitore dove è collocato il post in HTML
+//Individuare il contenitore dove è collocato il post in HTML
 const container = document.querySelector("#container");
 
-// Array contenente l'elenco di oggetti che corrispondono ai post
+//Array contenente l'elenco di oggetti che corrispondono ai post
 const posts = [
     {
         "id": 1,
@@ -74,7 +74,7 @@ const posts = [
     }
 ];
 
-// Array per tenere traccia dei like aggiornati
+//Array per tenere traccia dei like aggiornati
 const updatedLikes = posts.map(post => ({
     id: post.id,
     likes: post.likes
@@ -84,16 +84,30 @@ const updatedLikes = posts.map(post => ({
 // Estrarre gli oggetti dell'array
 posts.forEach((post) => {
 
-    //convertire la data in formato gg/mm/aa
+    //Convertire la data in formato gg/mm/aa attraverso la funzione "formatDate"
     const newDate = formatDate(post.created);
 
-    // Creare gli elementi di markup
+    //Verificare se l'immagine del profilo è null
+    let profileImage;
+
+    if (post.author.image) {
+        profileImage = `<img class="profile-pic" src="${post.author.image}" alt="${post.author.name}">`;
+    } else {
+        const initials = getInitials(post.author.name);
+        profileImage = `
+        <div class="fallback-profile">
+            <h4 class="fallback-text">${initials}</h4>
+        </div>`;
+    }
+    
+
+    //Creare gli elementi di markup
     let markupElement = `
         <div class="post">
             <div class="post__header">
                 <div class="post-meta">
                     <div class="post-meta__icon">
-                        <img class="profile-pic" src="${post.author.image}" alt="${post.author.name}">
+                        ${profileImage}
                     </div>
                     <div class="post-meta__data">
                         <div class="post-meta__author">${post.author.name}</div>
@@ -120,39 +134,41 @@ posts.forEach((post) => {
             </div>
         </div>
     `;
-    // Stampare in DOM i vari post
+    //Stampare in DOM i vari post
     container.innerHTML += markupElement;
 });
 
-// Individuare i pulsanti "Mi piace" della lista (ora che sono stati aggiunti al DOM)
+//Individuare i pulsanti "Mi piace" della lista (ora che sono stati aggiunti al DOM)
 const likeButtons = document.querySelectorAll(".js-like-button");
 
-// Creare evento per fare in modo che al click del pulsante "Mi Piace" il colore del testo cambi e aumenti il numero di like
+//Creare evento per fare in modo che al click del pulsante "Mi Piace" il colore del testo cambi e aumenti il numero di like
 likeButtons.forEach(button => {
     button.addEventListener('click', 
         
         function (event) {
         event.preventDefault();
 
-        // Cambiare colore del pulsante
+        //Cambiare colore del pulsante
         button.classList.toggle("like-button--liked");
 
-        // Trovare l'elemento counter corrispondente
+        //Trovare l'elemento counter corrispondente
         const postId = button.getAttribute("data-postid");
         const likeCounter = document.querySelector(`#like-counter-${postId}`);
 
-        // Trovare il post nell'array updatedLikes
+        //Trovare il post nell'array updatedLikes
         const post = updatedLikes.filter(post => post.id === parseInt(postId))[0];
 
-        // Incrementare il numero di like
+        //Incrementare il numero di like
         if (button.classList.contains("like-button--liked")) {
             post.likes++;
+        }else{
+            post.likes--;
         }
 
-        // Aggiornare il contenuto dell'elemento
+        //Aggiornare il contenuto dell'elemento
         likeCounter.textContent = post.likes;
 
-        // Log dell'array updatedLikes per conferma
+        //Log dell'array updatedLikes per conferma
         console.log(updatedLikes);
     });
 });
@@ -167,3 +183,9 @@ function formatDate(dateString) {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
 }
+
+// Funzione per ottenere le iniziali
+function getInitials(name) {
+    return name.split(' ').map(word => word[0]).join('').toUpperCase();
+}
+
