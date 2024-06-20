@@ -7,10 +7,10 @@ Salviamo in un secondo array gli id dei post ai quali abbiamo messo il like.*/
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//Individuare il contenitore dove è collocato il post in HTML
+// Individuare il contenitore dove è collocato il post in HTML
 const container = document.querySelector("#container");
 
-//Array contenente l'elenco di oggetti che corrispondono ai post
+// Array contenente l'elenco di oggetti che corrispondono ai post
 const posts = [
     {
         "id": 1,
@@ -69,16 +69,17 @@ const posts = [
     }
 ];
 
-//Estrarre gli oggetti dell'array
-posts.forEach((post) =>{
+// Array per tenere traccia dei like aggiornati
+const updatedLikes = posts.map(post => ({
+    id: post.id,
+    likes: post.likes
+    })
+);
 
-    //estrarre le proprietà degli array
-    for(let key in post){
-        console.log(key, " : ", post[key]);
-        
-    }
+// Estrarre gli oggetti dell'array
+posts.forEach((post) => {
 
-    //creare gli elementi di markup
+    // Creare gli elementi di markup
     let markupElement = `
         <div class="post">
             <div class="post__header">
@@ -92,27 +93,58 @@ posts.forEach((post) =>{
                     </div>
                 </div>
             </div>
-            <div class="post__text">Placeat libero ipsa nobis ipsum quibusdam quas harum ut. Distinctio minima iusto. Ad ad maiores et sint voluptate recusandae architecto. Et nihil ullam aut alias.</div>
+            <div class="post__text">${post.content}</div>
             <div class="post__image">
                 <img src="${post.media}" alt="${post.author.name}">
             </div>
             <div class="post__footer">
                 <div class="likes js-likes">
                     <div class="likes__cta">
-                        <a class="like-button  js-like-button" href="#" data-postid="1">
+                        <a class="like-button js-like-button" href="#" data-postid="${post.id}">
                             <i class="like-button__icon fas fa-thumbs-up" aria-hidden="true"></i>
                             <span class="like-button__label">Mi Piace</span>
                         </a>
                     </div>
                     <div class="likes__counter">
-                        Piace a <b id="like-counter-1" class="js-likes-counter">${post.likes}</b> persone
+                        Piace a <b id="like-counter-${post.id}" class="js-likes-counter">${post.likes}</b> persone
                     </div>
                 </div>
             </div>
         </div>
-
     `;
-
-    //stampare in DOM i vari post
+    // Stampare in DOM i vari post
     container.innerHTML += markupElement;
+});
+
+// Individuare i pulsanti "Mi piace" della lista (ora che sono stati aggiunti al DOM)
+const likeButtons = document.querySelectorAll(".js-like-button");
+
+// Creare evento per fare in modo che al click del pulsante "Mi Piace" il colore del testo cambi e aumenti il numero di like
+likeButtons.forEach(button => {
+    button.addEventListener('click', 
+        
+        function (event) {
+        event.preventDefault();
+
+        // Cambiare colore del pulsante
+        button.classList.toggle("like-button--liked");
+
+        // Trovare l'elemento counter corrispondente
+        const postId = button.getAttribute("data-postid");
+        const likeCounter = document.querySelector(`#like-counter-${postId}`);
+
+        // Trovare il post nell'array updatedLikes
+        const post = updatedLikes.filter(post => post.id === parseInt(postId))[0];
+
+        // Incrementare o decrementare il numero di like
+        if (button.classList.contains("like-button--liked")) {
+            post.likes++;
+        }
+
+        // Aggiornare il contenuto dell'elemento
+        likeCounter.textContent = post.likes;
+
+        // Log dell'array updatedLikes per conferma
+        console.log(updatedLikes);
+    });
 });
