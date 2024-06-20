@@ -136,7 +136,7 @@ likeButtons.forEach(button => {
         // Trovare il post nell'array updatedLikes
         const post = updatedLikes.filter(post => post.id === parseInt(postId))[0];
 
-        // Incrementare o decrementare il numero di like
+        // Incrementare il numero di like
         if (button.classList.contains("like-button--liked")) {
             post.likes++;
         }
